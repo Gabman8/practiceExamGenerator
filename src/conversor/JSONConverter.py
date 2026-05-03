@@ -3,7 +3,6 @@ import json
 import re
 import pdfplumber
 
-# TODO - Solve issue to skip the the title page and process all questions
 def parse_pdf_to_json(pdf_path):
     """Parse a developer-provided exam PDF into quiz question data."""
     with pdfplumber.open(pdf_path) as pdf:
@@ -12,7 +11,7 @@ def parse_pdf_to_json(pdf_path):
         )
 
     # Extract question blocks that begin at each "QUESTION NO:" marker.
-    matches = list(re.finditer(r"QUESTION NO:\s*\d+", text, re.IGNORECASE))
+    matches = list(re.finditer(r"QUESTION NO:\s*\d+", text, re.IGNORECASE)) + list(re.finditer(r"NO.\s*\d+", text, re.IGNORECASE))
     raw_questions = []
     if not matches:
         raw_questions = [text]
@@ -24,7 +23,6 @@ def parse_pdf_to_json(pdf_path):
 
     questions = []
     question_id = 1
-
     # Diagnostic counters help inspect blocks that were incomplete or parsed loosely.
     total_blocks = len(raw_questions)
     missing_answer_count = 0
