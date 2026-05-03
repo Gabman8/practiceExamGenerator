@@ -24,4 +24,4 @@ dist-ssr
 *.sw?
 src/conversor/questions.pdf
 src/conversor/questions.json
-src/conversor/skipped_questions_debug.json
+

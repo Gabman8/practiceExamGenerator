@@ -123,7 +123,9 @@ def parse_pdf_to_json(pdf_path):
             # Keep option text intact here.
             # Earlier filtering at this stage caused missing option content.
             match = option_start_pattern.match(line)
-
+            # Clear line with compiled_ignore_patterns before checking for option start to avoid false positives.
+            if any(pattern.search(line) for pattern in compiled_ignore_patterns):
+                continue
             if match:
                 # Start a new option block.
                 if current_option is not None:
@@ -245,7 +247,6 @@ if __name__ == "__main__":
     base_dir = Path(__file__).resolve().parent
     pdf_path = base_dir / "questions.pdf"
     output_json_path = base_dir / "questions.json"
-    debug_output_path = base_dir / "skipped_questions_debug.json"
 
     # The developer must provide questions.pdf locally to generate questions.json.
     # This repository does not include questions.pdf.
@@ -260,13 +261,6 @@ if __name__ == "__main__":
     with open(output_json_path, "w", encoding="utf-8") as file:
         json.dump(data, file, indent=2, ensure_ascii=False)
 
-    # Write a diagnostic report for manual inspection of edge cases.
-    try:
-        with open(debug_output_path, "w", encoding="utf-8") as debug_file:
-            json.dump(diagnostics, debug_file, indent=2, ensure_ascii=False)
-    except Exception:
-        pass
-
     print(f"Generated {len(data)} questions successfully.")
     print("Diagnostic summary:")
     print(f"  Total blocks found: {diagnostics['total_blocks']}")
@@ -274,6 +268,4 @@ if __name__ == "__main__":
     print(f"  Missing Answer lines: {diagnostics['missing_answer_count']}")
     print(f"  No option start detected: {diagnostics['no_option_start_count']}")
     print(f"  Invalid (empty text/options): {diagnostics['invalid_question_count']}")
-    print(
-        "Wrote 'questions.json' and 'skipped_questions_debug.json' for inspection."
-    )
+    
