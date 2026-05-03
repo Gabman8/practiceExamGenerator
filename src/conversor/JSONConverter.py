@@ -3,7 +3,7 @@ import json
 import re
 import pdfplumber
 
-
+# TODO - Solve issue to skip the the title page and process all questions
 def parse_pdf_to_json(pdf_path):
     """Parse a developer-provided exam PDF into quiz question data."""
     with pdfplumber.open(pdf_path) as pdf:
